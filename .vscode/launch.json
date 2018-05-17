@@ -5,6 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "启动Chrome程序",
+            "type": "chrome",
+            "request": "launch",
+            "file": "${workspaceRoot}/frontend/index.html",
+            "sourceMaps": false,
+            "webRoot": "${workspaceRoot}",
+        },
+        {
             "name": "启动Django程序",
             "type": "pythonExperimental",
             "request": "launch",
