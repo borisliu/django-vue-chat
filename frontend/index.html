@@ -50,195 +50,40 @@
             z-index: 100;
         }
 
-        #chat_top {
-            /*聊天框顶部*/
-            height: 40px;
-            width: 360px;
-            background-color: #1CD5B5;
-            text-align: center;
-            line-height: 40px;
-            font-size: 1.5rem;
-        }
-
-        #chat_message {
-            /*聊天框消息框*/
-            height: 250px;
-            width: 360px;
-            overflow-y: scroll;
-        }
-
-        #chat_tools {
-            /*聊天框工具栏*/
-            height: 30px;
-            width: 360px;
-            background-color: #1CD5B5;
-            line-height: 30px;
-            text-align: left;
-            padding-left: 5px;
-        }
-
-        #chat_input {
-            /*聊天框输入框*/
-            height: 90px;
-            width: 360px;
-            text-align: left;
-        }
-
-        #send {
-            /*聊天框发送按钮*/
-            position: absolute;
-            right: 0;
-            bottom: 0;
-            background-color: #1CD5B5;
-            border-radius: 3px;
-            font-size: 1.3rem;
-            color: white;
-        }
-
-        #service {
-            /*在线客服logo*/
-            display: inline-block;
-            margin-right: 5px;
-            position: relative;
-            top: 3px;
-        }
-
-        #pic_choose,
-        #face_choose {
-            /*选择图片按钮*/
-            display: inline-block;
-            position: relative;
-            top: -3px;
-            margin: 0 5px;
-        }
-
-        .message_service {
-            /*客服聊天框*/
-            padding: 10px 0 10px 10px;
-            text-align: left;
-            display: block;
-            clear: both;
-        }
-
-        .message_custom {
-            /*顾客聊天框*/
-            padding: 10px 0 10px 10px;
-            float: right;
-            display: none;
-        }
-
-        .service_left {
-            /*客服信息框左部*/
-            width: 50px;
-            float: left;
-        }
-
-        .service_right {
-            /*客服信息框右部*/
-            float: left;
-            max-width: 160px;
-        }
-
-        .custom_left {
-            /*顾客信息框左部*/
-            max-width: 160px;
-            float: right;
-        }
-
-        .custom_right {
-            /*客服信息框右部*/
-            float: right;
-            width: 50px;
-        }
-
-        .service_message_contain {
-            /*客服信息内容部分*/
-            max-width: 160px;
-            background: url(../images/chat_service.png);
-            -moz-background-size: 100% 100%;
-            /* 老版本的 Firefox */
-            background-size: 100% 100%;
-            /* 也可以用PX表示 */
-            background-repeat: no-repeat;
-            padding: 5px 3px 5px 10px;
-            font-size: 1rem;
-            text-align: left;
-        }
-
-        .custom_message_contain {
-            /*顾客信息内容部分*/
-            max-width: 160px;
-            min-width: 5px;
-            background: url(../images/chat_custom.png);
-            -moz-background-size: 100% 100%;
-            /* 老版本的 Firefox */
-            background-size: 100% 100%;
-            /* 也可以用PX表示 */
-            background-repeat: no-repeat;
-            padding: 5px 10px 5px 5px;
-            font-size: 1rem;
-            text-align: left;
-        }
-
-        .message_time {
-            /*客服聊天框时间*/
-            height: 15px;
-            width: 160px;
-            text-align: center;
-            font-size: 1rem;
-        }
-
-        .service_head {
-            /*客服聊天框头像*/
-            height: 40px;
-            width: 40px;
-            position: relative;
-            top: 10px;
-        }
     </style>
 </head>
 
 <body style="background:#F2F2F2;">
-    <!--在线客服-->
-    <div id="chat_logo">
-        在线客服
-    </div>
-    <div id="chat">
-        <div id="chat_top">
-            <img src="images/service.svg" id="service">
-            <span id="isOnline">在线客服为您服务（在线）</span>
+    <div id="app">
+        <!--在线客服-->
+        <div id="chat_logo">
+            在线客服
         </div>
-        <div id="chat_message">
+        <div id="chat">
+            <f7-page>
+                <f7-navbar title="在线客服"></f7-navbar>
 
-            <div class="message_service" id="message0">
-                <div class="service_left">
-                    <img src="images/service_head.jpeg" class="service_head">
-                </div>
-                <div class="service_right">
-                    <div class="message_time"></div>
-                    <div class="service_message_contain">您好，非常高兴为您服务！请问有什么需要咨询的吗？</div>
-                </div>
-            </div>
-            <div style='clear:both'></div>
+                <!-- Messagebar -->
+                <f7-messagebar placeholder="输入信息..." ref="messagebar">
+                    <!-- Send message link -->
+                    <f7-link icon-if-ios="f7:arrow_up_fill" icon-if-md="material:send" slot="inner-end" @click="sendMessage"></f7-link>
+                </f7-messagebar>
 
-            <div class="message_custom" id="message1">
-                <div class="custom_right">
-                    <img src="images/custom_head.jpg" class="service_head">
-                </div>
-
-                <div class="custom_left">
-                    <div class="message_time"></div>
-                    <div class="custom_message_contain"></div>
-                </div>
-            </div>
-            <div style='clear:both'></div>
+                <!-- Messages -->
+                <f7-messages ref="messages">
+                    <f7-messages-title>
+                        <b>Sunday, Feb 9,</b> 12:58</f7-messages-title>
+                    <f7-message v-for="(message, index) in messagesData" :key="index" :type="message.type" :text="message.text" :image="message.image"
+                        :name="message.name" :avatar="message.avatar" :first="isFirstMessage(message, index)" :last="isLastMessage(message, index)"
+                        :tail="isTailMessage(message, index)"></f7-message>
+                </f7-messages>
+            </f7-page>
 
         </div>
-        <textarea id="chat_input"></textarea>
-        <input type="button" value="发送" id="send">
 
     </div>
     <!--在线客服结束-->
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.js"></script>
     <!-- Path to Framework7 Library JS-->
     <script src="https://cdn.jsdelivr.net/npm/framework7@2.2.1/dist/js/framework7.js"></script>
@@ -250,35 +95,8 @@
     <script src="https://cdn.jsdelivr.net/npm/axios@0.18.0/dist/axios.js"></script>
     <!-- Path to your app js where you init your app-->
     <script>
-        $(function () {
-
-            //点击在线客服div，开关在线客服聊天框
-            $("#chat_logo").bind("click", function () {
-                var $this = $(this);
-
-                //如果是打开状态，则关闭
-                if ($this.css('right') == '366px') {
-                    $this.animate({
-                        right: '0px'
-                    });
-                    $this.next().animate({
-                        right: '-365px'
-                    });
-                    $this.css('backgroundImage', 'url(images/go_left.svg)');
-                } else {
-                    $this.animate({
-                        right: '366px'
-                    });
-                    $this.next().animate({
-                        right: '5px'
-                    });
-                    $this.css('backgroundImage', 'url(images/go_right.svg)');
-                }
-            });
-
-
-        });
         Vue.use(Framework7Vue, Framework7)
+        var $$ = Dom7;
 
         var vm = new Vue({
             el: '#app',
@@ -293,6 +111,84 @@
             },
             data: {
                 baseUrl: '',
+                messagesData: [{
+                        type: 'sent',
+                        text: 'Hi, Kate',
+                    },
+                    {
+                        type: 'sent',
+                        text: 'How are you?',
+                    },
+                    {
+                        name: 'Kate',
+                        type: 'received',
+                        text: 'Hi, I am good!',
+                        avatar: 'http://lorempixel.com/100/100/people/9',
+                    },
+                    {
+                        name: 'Blue Ninja',
+                        type: 'received',
+                        text: 'Hi there, I am also fine, thanks! And how are you?',
+                        avatar: 'http://lorempixel.com/100/100/people/7',
+                    },
+                    {
+                        type: 'sent',
+                        text: 'Hey, Blue Ninja! Glad to see you ;)',
+                    },
+                    {
+                        type: 'sent',
+                        text: 'Hey, look, cutest kitten ever!',
+                    },
+                    {
+                        type: 'sent',
+                        image: 'http://lorempixel.com/200/260/cats/4/',
+
+                    },
+                    {
+                        name: 'Kate',
+                        type: 'received',
+                        text: 'Nice!',
+                        avatar: 'http://lorempixel.com/100/100/people/9',
+                    },
+                    {
+                        name: 'Kate',
+                        type: 'received',
+                        text: 'Like it very much!',
+                        avatar: 'http://lorempixel.com/100/100/people/9',
+                    },
+                    {
+                        name: 'Blue Ninja',
+                        type: 'received',
+                        text: 'Awesome!',
+                        avatar: 'http://lorempixel.com/100/100/people/7',
+                    },
+                ],
+                // Dummy data
+                people: [{
+                        name: 'Kate Johnson',
+                        avatar: 'http://lorempixel.com/100/100/people/9',
+                    },
+                    {
+                        name: 'Blue Ninja',
+                        avatar: 'http://lorempixel.com/100/100/people/7',
+                    },
+                ],
+                answers: [
+                    'Yes!',
+                    'No',
+                    'Hm...',
+                    'I am not sure',
+                    'And what about you?',
+                    'May be ;)',
+                    'Lorem ipsum dolor sit amet, consectetur',
+                    'What?',
+                    'Are you sure?',
+                    'Of course',
+                    'Need to think about it',
+                    'Amazing!!!',
+                ],
+                // Response in progress flag
+                responseInProgress: false,
             },
             mounted: function () {
                 if (window.location.hostname === 'localhost') {
@@ -302,6 +198,99 @@
                 }
             },
             methods: {
+                isFirstMessage(message, index) {
+                    const self = this;
+                    const previousMessage = self.messagesData[index - 1];
+                    if (message.isTitle) return false;
+                    if (!previousMessage || previousMessage.type !== message.type || previousMessage.name !==
+                        message.name) return true;
+                    return false;
+                },
+                isLastMessage(message, index) {
+                    const self = this;
+                    const nextMessage = self.messagesData[index + 1];
+                    if (message.isTitle) return false;
+                    if (!nextMessage || nextMessage.type !== message.type || nextMessage.name !== message.name)
+                        return true;
+                    return false;
+                },
+                isTailMessage(message, index) {
+                    const self = this;
+                    const nextMessage = self.messagesData[index + 1];
+                    if (message.isTitle) return false;
+                    if (!nextMessage || nextMessage.type !== message.type || nextMessage.name !== message.name)
+                        return true;
+                    return false;
+                },
+                sendMessage() {
+                    const self = this;
+                    const text = self.messagebar.getValue().replace(/\n/g, '<br>').trim();
+
+                    if (text.length === 0) {
+                        // exit when empty messagebar text is empty
+                        return;
+                    }
+
+                    // Clear messagebar area
+                    self.messagebar.clear();
+
+                    // Focus area
+                    if (text.length) self.messagebar.focus();
+
+                    // Add sent message
+                    self.messagesData.push({
+                        text,
+                    });
+
+                    // Mock response
+                    if (self.responseInProgress) return;
+                    self.responseInProgress = true;
+                    setTimeout(() => {
+                        const answer = self.answers[Math.floor(Math.random() * self.answers.length)];
+                        const person = self.people[Math.floor(Math.random() * self.people.length)];
+                        self.messages.showTyping({
+                            header: `${person.name} is typing`,
+                            avatar: person.avatar,
+                        });
+                        setTimeout(() => {
+                            self.messagesData.push({
+                                text: answer,
+                                type: 'received',
+                                name: person.name,
+                                avatar: person.avatar,
+                            });
+                            self.messages.hideTyping();
+                            self.responseInProgress = false;
+                        }, 4000);
+                    }, 1000);
+                },
+                onF7Ready(f7) {
+                    const self = this;
+                    // References to us APIs
+                    self.messagebar = self.$refs.messagebar.f7Messagebar;
+                    self.messages = self.$refs.messages.f7Messages;
+                    //点击在线客服div，开关在线客服聊天框
+                    $$("#chat_logo").on("click", function () {
+                        //如果是打开状态，则关闭
+                        if ($$(this).css('right') == '366px') {
+                            $$(this).animate({
+                                right: '0px'
+                            });
+                            $$(this).next().animate({
+                                right: '-365px'
+                            });
+                            $$(this).css('backgroundImage', 'url(images/go_left.svg)');
+                        } else {
+                            $$(this).animate({
+                                right: '366px'
+                            });
+                            $$(this).next().animate({
+                                right: '5px'
+                            });
+                            $$(this).css('backgroundImage', 'url(images/go_right.svg)');
+                        }
+                    });
+                },
                 buildUrl: function (url) {
                     return this.baseUrl + url;
                 }
