@@ -5,9 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "启动Django程序",
+            "type": "pythonExperimental",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": [
+                "runserver",
+                "--nothreading"
+            ],
+            "django": true
+        },
+        {
             "type": "node",
             "request": "launch",
-            "name": "启动程序",
+            "name": "启动express程序",
             "program": "${workspaceFolder}\\index.js"
         }
     ]
