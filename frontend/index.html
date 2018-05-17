@@ -49,7 +49,6 @@
             cursor: default;
             z-index: 100;
         }
-
     </style>
 </head>
 
@@ -72,7 +71,7 @@
                 <!-- Messages -->
                 <f7-messages ref="messages">
                     <f7-messages-title>
-                        <b>Sunday, Feb 9,</b> 12:58</f7-messages-title>
+                        {{ new Date().toLocaleTimeString() }}</f7-messages-title>
                     <f7-message v-for="(message, index) in messagesData" :key="index" :type="message.type" :text="message.text" :image="message.image"
                         :name="message.name" :avatar="message.avatar" :first="isFirstMessage(message, index)" :last="isLastMessage(message, index)"
                         :tail="isTailMessage(message, index)"></f7-message>
