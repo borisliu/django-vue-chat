@@ -1,17 +1,9 @@
-# chat-room
+# djang-vue-chat
 使用Django Channels构造的一个聊天程序，分为前后台，前台界面采用Framework7-Vue构建，后台界面采用Element-UI构建，一个后台可以和多个前台同时聊天。
 
-# chatRoom
-网站在线客服（基于socket.io和node）
+很多网站都会用到在线客服这个功能，该插件基于Django和WebSocket制作，使用他您可以完成多对一即时聊天，即客服一个端(service)，多个用户可以和唯一的客服聊天,当然如果你登录两个客服端，他们都能同时收到客户发来的信息，程序运行需要Django，如果不会可以看我的另外一篇教程[从Python到Django入门教程](https://borisliu.gitbooks.io/from-python-to-django/)
 
-<br/>
-
-
-参考链接：<a href="http://www.guangzhouyueyang.com" target="_blank">http://www.guangzhouyueyang.com </a><br/>
-
-很多网站都会用到在线客服这个功能，该插件基于node和socket.io制作，使用他您可以完成多对一即时聊天，即客服一个端(chatServer.html)，多个用户可以和唯一客户端聊天,当然如果你登录两个客服端，他们都能同时收到客户发来的信息，程序运行需要node，并且安装index.js需要的对应模块(express, socket.io)，不会的就自行度娘啦<br/><br/>
-
-程序工作原理： <br/>
+程序工作原理：
   每个客户都有自己的socketId，客服被分在同一个命名空间（service分组），客户发信息，服务器转发给server分组中所有成员(所有客服)，并记录好发来信息的客户sockeId，客服回复信息到指定客户就是通过socketId来完成。具体细节看代码注释。
 
 下面是使用截图： <br/>
@@ -39,7 +31,5 @@
 ![Image text](https://raw.github.com/nayonglin/chatRoom/master/img-folder/9.png) <br/>
 ![Image text](https://raw.github.com/nayonglin/chatRoom/master/img-folder/10.png) <br/>
 
-
-<br/><br/>
 目前还没实现图片和表情的发送。
 
