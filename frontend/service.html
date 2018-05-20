@@ -172,7 +172,7 @@
                                 </div>
                             </div>
                         </el-card>
-                        <el-menu :router="true">
+                        <el-menu>
                             <el-menu-item index="1-1" :route="{path:'/bar/1'}">选项1</el-menu-item>
                             <el-menu-item index="1-2" :route="{path:'/foo'}">选项2</el-menu-item>
                             <el-menu-item index="1-3">选项3</el-menu-item>
@@ -210,16 +210,6 @@
         </el-row>
     </div>
 
-    <template id="home">
-        <div>Home</div>
-    </template>
-    <template id="foo">
-        <div>Foo</div>
-    </template>
-
-    <template id="bar">
-        <div>Bar {{ id }}</div>
-    </template>
 </body>
 <!-- import Vue before Element -->
 <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
@@ -228,39 +218,8 @@
 <!-- import JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/element-ui@2.3.7/lib/index.js"></script>
 <script>
-    var homeComponent = Vue.extend({
-        template: '#home'
-    });
-
-    var fooComponent = Vue.extend({
-        template: '#foo'
-    });
-
-    var barComponent = Vue.extend({
-        template: '#bar',
-        props: ['id']
-    });
-
-    var router = new VueRouter({
-        routes: [{
-                path: '/',
-                component: homeComponent
-            },
-            {
-                path: '/foo',
-                component: fooComponent
-            },
-            {
-                path: '/bar/:id',
-                component: barComponent,
-                props: true
-            }
-        ]
-    });
-
     new Vue({
         el: '#app',
-        router,
         data: {
             content: '',
             user: {
