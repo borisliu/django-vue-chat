@@ -261,15 +261,40 @@
     new Vue({
         el: '#app',
         router,
-        data: function () {
-            const item = {
-                date: '2016-05-02',
-                name: '王小虎',
-                address: '上海市普陀区金沙江路 1518 弄'
-            };
-            return {
-                tableData: Array(20).fill(item)
-            }
+        data: {
+            content: '',
+            user: {
+                name: 'coffce',
+                img: 'dist/images/1.jpg'
+            },
+            sessions: [{
+                    id: 1,
+                    user: {
+                        name: '示例介绍',
+                        img: 'dist/images/2.png'
+                    },
+                    messages: [{
+                        content: 'Hello，这是一个基于Vue + Vuex + Webpack构建的简单chat示例，聊天记录保存在localStorge, 有什么问题可以通过Github Issue问我。',
+                        date: now
+                    }, {
+                        content: '项目地址: https://github.com/coffcer/vue-chat',
+                        date: now
+                    }, {
+                        content: '你好',
+                        date: now,
+                        self: true
+                    }]
+                },
+                {
+                    id: 2,
+                    user: {
+                        name: 'webpack',
+                        img: 'dist/images/3.jpg'
+                    },
+                    messages: []
+                }
+            ],
+            currentSessionId: 1,
         }
     })
 </script>
