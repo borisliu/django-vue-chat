@@ -14,7 +14,7 @@
 
         .el-aside {
             color: #333;
-            height: 700px;
+            height: 600px;
         }
 
         .time {
@@ -46,6 +46,114 @@
         .clearfix:after {
             clear: both
         }
+
+        #chat {
+            margin: 0px auto;
+            overflow: hidden;
+            border-radius: 3px;
+            box-sizing: border-box;
+            color: #4d4d4d;
+            font: 14px/1.4em 'Helvetica Neue', Helvetica, 'Microsoft Yahei', Arial, sans-serif;
+            background-size: cover;
+        }
+
+        #chat *:before *:after {
+            box-sizing: inherit;
+        }
+
+        #chat .message {
+            height: calc(100% - 160px);
+            padding: 10px 15px;
+            overflow-y: scroll;
+        }
+
+        #chat .message ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        #chat .message li {
+            margin-bottom: 15px;
+        }
+
+        #chat .message .time {
+            margin: 7px 0;
+            text-align: center;
+        }
+
+        #chat .message .time>span {
+            display: inline-block;
+            padding: 0 18px;
+            font-size: 12px;
+            color: #fff;
+            border-radius: 2px;
+            background-color: #dcdcdc;
+        }
+
+        #chat .message .avatar {
+            float: left;
+            margin: 0 10px 0 0;
+            border-radius: 3px;
+        }
+
+        #chat .message .text {
+            display: inline-block;
+            position: relative;
+            padding: 0 10px;
+            max-width: calc(100% - 40px);
+            min-height: 30px;
+            line-height: 2.5;
+            font-size: 12px;
+            text-align: left;
+            word-break: break-all;
+            background-color: #fafafa;
+            border-radius: 4px;
+        }
+
+        #chat .message .text:before {
+            content: " ";
+            position: absolute;
+            top: 9px;
+            right: 100%;
+            border: 6px solid transparent;
+            border-right-color: #fafafa;
+        }
+
+        #chat .message .self {
+            text-align: right;
+        }
+
+        #chat .message .self .avatar {
+            float: right;
+            margin: 0 0 0 10px;
+        }
+
+        #chat .message .self .text {
+            background-color: #b2e281;
+        }
+
+        #chat .message .self .text:before {
+            right: inherit;
+            left: 100%;
+            border-right-color: transparent;
+            border-left-color: #b2e281;
+        }
+
+        #chat .word {
+            height: 160px;
+            border-top: solid 1px #ddd;
+        }
+
+        #chat .word textarea {
+            padding: 10px;
+            height: 100%;
+            width: 100%;
+            border: none;
+            outline: none;
+            font-family: "Micrsofot Yahei";
+            resize: none;
+        }
     </style>
 </head>
 
@@ -56,7 +164,6 @@
                 <el-container style="border: 1px solid #eee">
                     <el-aside width="240px" style="border: 1px solid #eee">
                         <el-card :body-style="{ padding: '0px' }">
-                            <img src="~examples/assets/images/hamburger.png" class="image">
                             <div style="padding: 14px;">
                                 <span>好吃的汉堡</span>
                                 <div class="bottom clearfix">
@@ -73,11 +180,30 @@
                         </el-menu>
                     </el-aside>
 
-                    <el-main style="padding:0px;">
-                        <el-container style="height: 540px;border: 1px solid #eee">
-                        </el-container>
-                        <el-container style="height: 160px;border: 1px solid #eee">
-                        </el-container>
+                    <el-main style="padding:0px;" id="chat">
+                        <div class="message" style="border: 1px solid #eee;background-color:#f5f5f5">
+                            <ul>
+                                <p class="time">
+                                    <span>2018.1.1</span>
+                                </p>
+                                <li>
+                                    <div class="main">
+                                        <img class="avatar" width="30" height="30" src="images/client.png" />
+                                        <div class="text">你好啊，我有个问题想要咨询 </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="main self">
+                                        <img class="avatar" width="30" height="30" src="images/self.jpg" />
+                                        <div class="text">什么问题，我想想能不能回答你</div>
+                                    </div>
+                                </li>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="word">
+                            <textarea placeholder="按 Ctrl + Enter 发送" v-model="content" @keyup="onKeyup"></textarea>
+                        </div>
                     </el-main>
                 </el-container>
             </el-col>
