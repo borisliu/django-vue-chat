@@ -9,6 +9,11 @@
         body {
             background: #f5f5f5 url('images/bg.jpg') no-repeat center;
         }
+
+        .el-container {
+            border: 1px solid #eee;
+        }
+
         .el-header {
             background-color: #B3C0D1;
             color: #333;
@@ -19,6 +24,15 @@
             color: #333;
             height: 600px;
             background-color: #fff;
+            border: 1px solid #eee;
+        }
+
+        .el-card {
+            padding: 14px;
+        }
+
+        .el-main {
+            padding: 0px;
         }
 
         .time {
@@ -70,6 +84,8 @@
             height: calc(100% - 160px);
             padding: 10px 15px;
             overflow-y: scroll;
+            border: 1px solid #eee;
+            background-color: #f5f5f5
         }
 
         #chat .message ul {
@@ -159,6 +175,7 @@
             font-family: "Micrsofot Yahei";
             resize: none;
         }
+
         #chat .send {
             text-align: right;
             padding: 5px;
@@ -175,13 +192,13 @@
     <div id="app">
         <el-row type="flex" justify="center">
             <el-col :span="16">
-                <el-container style="border: 1px solid #eee">
-                    <el-aside width="240px" style="border: 1px solid #eee">
-                        <el-card :body-style="{ padding: '0px' }">
-                            <div style="padding: 14px;">
+                <el-container>
+                    <el-aside width="240px">
+                        <el-card>
+                            <div>
                                 <span>好吃的汉堡</span>
                                 <div class="bottom clearfix">
-                                    <time class="time">{{ currentDate }}</time>
+                                    <time class="time">2018.5.21</time>
                                     <el-button type="text" class="button">操作按钮</el-button>
                                 </div>
                             </div>
@@ -194,24 +211,17 @@
                         </el-menu>
                     </el-aside>
 
-                    <el-main style="padding:0px;" id="chat">
-                        <div class="message" style="border: 1px solid #eee;background-color:#f5f5f5">
+                    <el-main id="chat">
+                        <div class="message">
                             <ul>
-                                <p class="time">
-                                    <span>2018.1.1</span>
-                                </p>
-                                <li>
-                                    <div class="main">
-                                        <img class="avatar" width="30" height="30" src="images/client.png" />
-                                        <div class="text">你好啊，我有个问题想要咨询 </div>
+                                <li v-for="item in currentSession.messages">
+                                    <p class="time">
+                                        <span>{{ item.time | time }}</span>
+                                    </p>
+                                    <div class="main" :class="{ self: item.type == 'service' }">
+                                        <img class="avatar" width="30" height="30" :src="item.type == 'service' ? user.img : currentSession.user.img" />
+                                        <div class="text">{{ item.message }}</div>
                                     </div>
-                                </li>
-                                <li>
-                                    <div class="main self">
-                                        <img class="avatar" width="30" height="30" src="images/self.jpg" />
-                                        <div class="text">什么问题，我想想能不能回答你</div>
-                                    </div>
-                                </li>
                                 </li>
                             </ul>
                         </div>
@@ -243,37 +253,71 @@
             content: '',
             user: {
                 name: 'coffce',
-                img: 'dist/images/1.jpg'
+                img: 'images/self.jpg'
             },
             sessions: [{
-                    id: 1,
+                    id: 0,
                     user: {
-                        name: '示例介绍',
-                        img: 'dist/images/2.png'
+                        name: '示例',
+                        img: 'images/client.png'
                     },
                     messages: [{
-                        content: 'Hello，这是一个基于Vue + Vuex + Webpack构建的简单chat示例，聊天记录保存在localStorge, 有什么问题可以通过Github Issue问我。',
-                        date: now
+                        message: 'Hello，这是一个基于Vue + Vuex + Webpack构建的简单chat示例，聊天记录保存在localStorge, 有什么问题可以通过Github Issue问我。',
+                        time: now,
+                        type: 'client',
                     }, {
-                        content: '项目地址: https://github.com/coffcer/vue-chat',
-                        date: now
+                        message: '项目地址: https://github.com/coffcer/vue-chat',
+                        time: now,
+                        type: 'client',
                     }, {
-                        content: '你好',
-                        date: now,
-                        self: true
+                        message: '你好',
+                        time: now,
+                        type: 'service'
                     }]
                 },
                 {
-                    id: 2,
+                    id: 1,
                     user: {
-                        name: 'webpack',
-                        img: 'dist/images/3.jpg'
+                        name: '介绍',
+                        img: 'images/client.png'
                     },
-                    messages: []
+                    messages: [{
+                        message: 'Hello, 有什么问题可以通过Github Issue问我。',
+                        time: now,
+                        type: 'client',
+                    }, {
+                        message: '项目 https://github.com/coffcer/vue-chat',
+                        time: now,
+                        type: 'client',
+                    }, {
+                        message: '你好啊。',
+                        time: now,
+                        type: 'service',
+                    }]
                 }
             ],
             currentSessionId: 1,
-        }
+        },
+        computed: {
+            currentSession: function () {
+                let currentSessionId = this.currentSessionId;
+                return this.sessions.find(session => session.id === currentSessionId);
+            }
+        },
+        methods: {
+            onKeyup: function () {
+                return true;
+            }
+        },
+        filters: {
+            // 将日期过滤为 hour:minutes
+            time(date) {
+                if (typeof date === 'string') {
+                    date = new Date(date).toLo;
+                }
+                return date.toLocaleTimeString();
+            }
+        },
     })
 </script>
 
