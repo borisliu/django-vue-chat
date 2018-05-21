@@ -59,6 +59,7 @@
             color: #4d4d4d;
             font: 14px/1.4em 'Helvetica Neue', Helvetica, 'Microsoft Yahei', Arial, sans-serif;
             background-size: cover;
+            background-color: #fff;
         }
 
         #chat *:before *:after {
@@ -145,7 +146,7 @@
         }
 
         #chat .word {
-            height: 160px;
+            height: 100px;
             border-top: solid 1px #ddd;
         }
 
@@ -157,6 +158,15 @@
             outline: none;
             font-family: "Micrsofot Yahei";
             resize: none;
+        }
+        #chat .send {
+            text-align: right;
+            padding: 5px;
+            height: 20px;
+            border: none;
+            outline: none;
+            font-family: "Micrsofot Yahei";
+            color: #888;
         }
     </style>
 </head>
@@ -206,7 +216,11 @@
                             </ul>
                         </div>
                         <div class="word">
-                            <textarea placeholder="按 Ctrl + Enter 发送" v-model="content" @keyup="onKeyup"></textarea>
+                            <textarea v-model="content" @keyup="onKeyup"></textarea>
+                        </div>
+                        <div class="send">
+                            <span>按 Ctrl + Enter 发送</span>
+                            <el-button plain size="mini">发送</el-button>
                         </div>
                     </el-main>
                 </el-container>
