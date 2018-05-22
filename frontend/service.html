@@ -71,7 +71,7 @@
         }
 
         #chat .message {
-            height: calc(100% - 160px);
+            height: 420px;
             padding: 10px 15px;
             overflow-y: scroll;
             border: 1px solid #eee;
@@ -214,7 +214,8 @@
                             </ul>
                         </div>
                         <div class="word">
-                            <textarea v-model="content" @keyup="onKeyup"></textarea>
+                            <el-input type="textarea" :rows="4" @keyup="onKeyup" v-model="content">
+                            </el-input>
                         </div>
                         <div class="send">
                             <span>按 Ctrl + Enter 发送</span>
@@ -233,6 +234,8 @@
 <script src="https://cdn.jsdelivr.net/npm/vue-router@3.0.1/dist/vue-router.js"></script>
 <!-- import JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/element-ui@2.3.7/lib/index.js"></script>
+<!-- import jQuery -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.js"></script>
 <script>
     let now = new Date();
     let vm = new Vue({
@@ -253,6 +256,62 @@
                         message: 'Hello，这是一个基于Vue + Vuex + Webpack构建的简单chat示例，聊天记录保存在localStorge, 有什么问题可以通过Github Issue问我。',
                         time: now,
                         type: 'client',
+                    }, {
+                        message: '项目地址: https://github.com/coffcer/vue-chat',
+                        time: now,
+                        type: 'client',
+                    }, {
+                        message: '你好',
+                        time: now,
+                        type: 'service'
+                    }, {
+                        message: '项目地址: https://github.com/coffcer/vue-chat',
+                        time: now,
+                        type: 'client',
+                    }, {
+                        message: '你好',
+                        time: now,
+                        type: 'service'
+                    }, {
+                        message: '项目地址: https://github.com/coffcer/vue-chat',
+                        time: now,
+                        type: 'client',
+                    }, {
+                        message: '你好',
+                        time: now,
+                        type: 'service'
+                    }, {
+                        message: '项目地址: https://github.com/coffcer/vue-chat',
+                        time: now,
+                        type: 'client',
+                    }, {
+                        message: '你好',
+                        time: now,
+                        type: 'service'
+                    }, {
+                        message: '项目地址: https://github.com/coffcer/vue-chat',
+                        time: now,
+                        type: 'client',
+                    }, {
+                        message: '你好',
+                        time: now,
+                        type: 'service'
+                    }, {
+                        message: '项目地址: https://github.com/coffcer/vue-chat',
+                        time: now,
+                        type: 'client',
+                    }, {
+                        message: '你好',
+                        time: now,
+                        type: 'service'
+                    }, {
+                        message: '项目地址: https://github.com/coffcer/vue-chat',
+                        time: now,
+                        type: 'client',
+                    }, {
+                        message: '你好',
+                        time: now,
+                        type: 'service'
                     }, {
                         message: '项目地址: https://github.com/coffcer/vue-chat',
                         time: now,
@@ -306,6 +365,104 @@
                 return date.toLocaleTimeString();
             }
         },
+        mounted: function () {
+            //和服务器建立WebSocket链接
+            let ws_protocol = '';
+            let connection_string = '';
+            let self = this;
+            if (window.location.protocol === 'https:') {
+                ws_protocol = 'wss://';
+                '/';
+            } else {
+                ws_protocol = 'ws://';
+            }
+            connection_string = ws_protocol + window.location.host + '/ws/master/' + this.user.name + '/';
+            console.log('in service.html, connection string:' + connection_string);
+            var socket = new WebSocket(connection_string);
+
+            //监听服务器转发的客户消息
+            socket.onmessage = function (e) {
+                let data = JSON.parse(e.data);
+                let id = data['id'];
+                let time = data['time'];
+                let type = data['type']
+                let message = data['message'];
+                let name = data['name'];
+                let avatar = data['avatar'];
+                switch (type) {
+                    case 'client_message':
+                        let session = self.sessions.find(session => session.id === id);
+                        if (session) {
+                            //找到了已经有的用户
+                            session.messages.push({
+                                message: message,
+                                time: time,
+                                type: 'client',
+                            });
+                        } else {
+                            //没有找到用户，需要新建一个session
+                            self.sessions.push({
+                                id: id,
+                                user: {
+                                    name: name,
+                                    avatar: avatar,
+                                },
+                                messages: {
+                                    message: message,
+                                    time: time,
+                                    type: 'client',
+                                }
+                            })
+                        }
+                        $('div.message').scrollTop($('div.message ul')[0].scrollHeight);
+                        break;
+                    case 'service_message':
+                        console.log('master_message');
+                        console.log(data);
+                        break;
+                }
+            };
+
+            socket.onclose = function (e) {
+                console.error('Chat socket closed unexpectedly');
+            };
+
+
+            //点击发送按钮，发送信息给在线客服
+            $("#send").bind("click", function () {
+                var $this = $(this);
+
+                //如果输入框不为空
+                if ($this.prev().val() != "") {
+                    var choosed = $("#choose_chat option:selected").val();
+                    var destination_id = "/custom#" + choosed; //要发送到的客户端id
+                    console.log(destination_id);
+                    var message = $this.prev().val();
+                    var $pause = $("#message1").clone();
+                    var time = new Date().toLocaleTimeString(); //获得发送时间
+                    var $chat_pause = $("#" + choosed); //获得聊天信息框准备插入新数据
+
+                    //把数据通过socket.io发送给后台
+                    socket.send(JSON.stringify({
+                        'type': 'master_message',
+                        'time': time,
+                        'destionation_id': destination_id,
+                        'message': message
+                    }));
+
+                    $this.prev().val(""); //点发送，清空输入框
+                    $pause.find(".custom_message_contain").text(message);
+                    $pause.css("display", "block");
+                    $pause.attr("id", "");
+                    $pause.find(".message_time").text(time);
+
+                    $chat_pause.append($pause).append("<div style='clear:both'></div>");
+                    $chat_pause.scrollTop($chat_pause[0].scrollHeight); //滚动条置底
+                }
+                $('#chat_input').focus();
+            });
+
+        }
     })
 </script>
 

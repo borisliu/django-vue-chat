@@ -8,7 +8,7 @@
             "name": "启动Chrome程序",
             "type": "chrome",
             "request": "launch",
-            "file": "${workspaceRoot}/frontend/service.html",
+            "file": "${workspaceRoot}/frontend/client.html",
             "sourceMaps": false,
             "webRoot": "${workspaceRoot}",
         },

@@ -62,20 +62,20 @@
             <f7-page>
                 <f7-navbar title="在线客服"></f7-navbar>
 
-                <!-- Messagebar -->
-                <f7-messagebar placeholder="输入信息..." ref="messagebar">
-                    <!-- Send message link -->
-                    <f7-link icon-if-ios="f7:arrow_up_fill" icon-if-md="material:send" slot="inner-end" @click="sendMessage"></f7-link>
-                </f7-messagebar>
-
                 <!-- Messages -->
                 <f7-messages ref="messages">
                     <f7-messages-title>
                         {{ new Date().toLocaleTimeString() }}</f7-messages-title>
-                    <f7-message v-for="(message, index) in messagesData" :key="index" :type="message.type" :text="message.text" :image="message.image"
+                    <f7-message v-for="(message, index) in messages" :key="index" :type="message.type" :text="message.message" :image="message.image"
                         :name="message.name" :avatar="message.avatar" :first="isFirstMessage(message, index)" :last="isLastMessage(message, index)"
                         :tail="isTailMessage(message, index)"></f7-message>
                 </f7-messages>
+
+                <!-- Messagebar -->
+                <f7-messagebar placeholder="Send message" ref="messagebar">
+                    <!-- Send message link -->
+                    <f7-link icon-if-ios="f7:arrow_up_fill" icon-if-md="material:send" slot="inner-end" @click="sendMessage"></f7-link>
+                </f7-messagebar>
             </f7-page>
 
         </div>
@@ -110,91 +110,13 @@
             },
             data: {
                 baseUrl: '',
-                messagesData: [{
-                        type: 'sent',
-                        text: 'Hi, Kate',
-                    },
-                    {
-                        type: 'sent',
-                        text: 'How are you?',
-                    },
-                    {
-                        name: 'Kate',
-                        type: 'received',
-                        text: 'Hi, I am good!',
-                        avatar: 'http://lorempixel.com/100/100/people/9',
-                    },
-                    {
-                        name: 'Blue Ninja',
-                        type: 'received',
-                        text: 'Hi there, I am also fine, thanks! And how are you?',
-                        avatar: 'http://lorempixel.com/100/100/people/7',
-                    },
-                    {
-                        type: 'sent',
-                        text: 'Hey, Blue Ninja! Glad to see you ;)',
-                    },
-                    {
-                        type: 'sent',
-                        text: 'Hey, look, cutest kitten ever!',
-                    },
-                    {
-                        type: 'sent',
-                        image: 'http://lorempixel.com/200/260/cats/4/',
-
-                    },
-                    {
-                        name: 'Kate',
-                        type: 'received',
-                        text: 'Nice!',
-                        avatar: 'http://lorempixel.com/100/100/people/9',
-                    },
-                    {
-                        name: 'Kate',
-                        type: 'received',
-                        text: 'Like it very much!',
-                        avatar: 'http://lorempixel.com/100/100/people/9',
-                    },
-                    {
-                        name: 'Blue Ninja',
-                        type: 'received',
-                        text: 'Awesome!',
-                        avatar: 'http://lorempixel.com/100/100/people/7',
-                    },
-                ],
-                // Dummy data
-                people: [{
-                        name: 'Kate Johnson',
-                        avatar: 'http://lorempixel.com/100/100/people/9',
-                    },
-                    {
-                        name: 'Blue Ninja',
-                        avatar: 'http://lorempixel.com/100/100/people/7',
-                    },
-                ],
-                answers: [
-                    'Yes!',
-                    'No',
-                    'Hm...',
-                    'I am not sure',
-                    'And what about you?',
-                    'May be ;)',
-                    'Lorem ipsum dolor sit amet, consectetur',
-                    'What?',
-                    'Are you sure?',
-                    'Of course',
-                    'Need to think about it',
-                    'Amazing!!!',
-                ],
-                // Response in progress flag
-                responseInProgress: false,
+                messages: [],
+                id: '',
+                name: '',
+                avatar: '',
             },
             mounted: function () {
-                if (window.location.hostname === 'localhost') {
-                    this.baseUrl = window.location.protocol + '//' + window.location.host + '/';
-                } else {
-                    this.baseUrl = window.location.protocol + '//' + window.location.host + '/shandefu/';
-                }
+                this.baseUrl = window.location.protocol + '//' + window.location.host + '/';
             },
             methods: {
                 isFirstMessage(message, index) {
@@ -221,11 +143,11 @@
                         return true;
                     return false;
                 },
-                sendMessage() {
+                sendMessage: function () {
                     const self = this;
-                    const text = self.messagebar.getValue().replace(/\n/g, '<br>').trim();
+                    const message = self.messagebar.getValue().replace(/\n/g, '<br>').trim();
 
-                    if (text.length === 0) {
+                    if (message.length === 0) {
                         // exit when empty messagebar text is empty
                         return;
                     }
@@ -234,36 +156,27 @@
                     self.messagebar.clear();
 
                     // Focus area
-                    if (text.length) self.messagebar.focus();
+                    if (message.length) self.messagebar.focus();
 
                     // Add sent message
-                    self.messagesData.push({
-                        text,
+                    var time = new Date().toLocaleTimeString(); //获得发送时间
+                    self.messages.push({
+                        id: self.id,
+                        type: 'client_message',
+                        time: time,
+                        message: message
                     });
 
-                    // Mock response
-                    if (self.responseInProgress) return;
-                    self.responseInProgress = true;
-                    setTimeout(() => {
-                        const answer = self.answers[Math.floor(Math.random() * self.answers.length)];
-                        const person = self.people[Math.floor(Math.random() * self.people.length)];
-                        self.messages.showTyping({
-                            header: `${person.name} is typing`,
-                            avatar: person.avatar,
-                        });
-                        setTimeout(() => {
-                            self.messagesData.push({
-                                text: answer,
-                                type: 'received',
-                                name: person.name,
-                                avatar: person.avatar,
-                            });
-                            self.messages.hideTyping();
-                            self.responseInProgress = false;
-                        }, 4000);
-                    }, 1000);
+                    //把数据通过socket.io发送给后台
+                    self.socket.send(JSON.stringify({
+                        'id': self.id,
+                        'type': 'client_message',
+                        'time': time,
+                        'message': message
+                    }));
+
                 },
-                onF7Ready(f7) {
+                onF7Ready: function () {
                     const self = this;
                     // References to us APIs
                     self.messagebar = self.$refs.messagebar.f7Messagebar;
@@ -289,6 +202,62 @@
                             $$(this).css('backgroundImage', 'url(images/go_right.svg)');
                         }
                     });
+                    //和服务器建立WebSocket链接
+                    let ws_protocol = 'ws://';
+                    let connection_string = '';
+                    let id = String(new Date().getTime()) + Math.floor(Math.random() * 10);
+                    self.id = id;
+                    connection_string = ws_protocol + window.location.host + '/ws/client/' + id + '/';
+                    console.log('connection string:' + connection_string)
+                    self.socket = new WebSocket(connection_string);
+
+                    self.socket.onopen = function () {
+                        console.log("opening a connection...");
+                    };
+
+                    self.socket.onerror = function (evt) {
+                        console.log("ERR: " + evt.data);
+                    };
+
+                    self.socket.onclose = function (e) {
+                        console.log('Chat socket closed unexpectedly');
+                    };
+
+                    self.socket.onmessage = function (e) {
+                        let data = JSON.parse(e.data);
+                        let id = data['id'];
+                        let type = data['type']
+                        let time = data['time']
+                        let message = data['message'];
+                        let name = data['name'];
+                        let avatar = data['avatar'];
+                        switch (type) {
+                            case 'isOnline':
+                                //进页面判断msg真假值，检测客服在不在线
+                                //message = true为在线
+                                if (message == false) {
+                                    console.log('客服当前不在线');
+                                    self.messagebar.disabled = true;
+                                }
+                                break;
+                            case 'client_message':
+                                console.log('client_message');
+                                console.log(data);
+                                break;
+                            case 'service_message':
+                                //监听服务器转发的客服消息
+                                self.messages.push({
+                                    id: id,
+                                    type: 'service',
+                                    time: time,
+                                    message: message,
+                                    name: name,
+                                    avatar: avatar,
+                                });
+                                break;
+                        }
+                    };
+
                 },
                 buildUrl: function (url) {
                     return this.baseUrl + url;
