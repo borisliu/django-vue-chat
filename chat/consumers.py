@@ -8,7 +8,7 @@ class ClientConsumer(AsyncWebsocketConsumer):
 
         # Join room group
         await self.channel_layer.group_add(
-            self.group_name,
+            self.room_group_name,
             self.channel_name
         )
 
@@ -23,8 +23,7 @@ class ClientConsumer(AsyncWebsocketConsumer):
 
     # Receive message from WebSocket
     async def receive(self, text_data):
-        print('in ClientConsumer.receive, receive a text_data:' + text_data_json)
-        text_data_dict = json.loads(text_data_json)
+        text_data_dict = json.loads(text_data)
         message = text_data_dict['message']
 
         print('in ClientConsumer.receive, receive a message:' + message)
@@ -70,7 +69,7 @@ class ServiceConsumer(AsyncWebsocketConsumer):
 
     # Receive message from WebSocket
     async def receive(self, text_data):
-        text_data_dict = json.loads(text_data_json)
+        text_data_dict = json.loads(text_data)
         message = text_data_dict['message']
 
         print('in ServiceConsumer.receive, receive a message:' + message)

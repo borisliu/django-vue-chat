@@ -29,7 +29,7 @@
             height: 100px;
             font-size: 1.6rem;
             text-align: right;
-            background: url(../images/go_left.svg) -3px 40px no-repeat #d7e0e6;
+            background: url(/static/images/go_left.svg) -3px 40px no-repeat #d7e0e6;
             border-radius: 3px;
             cursor: default;
             padding-right: 4px;
@@ -53,6 +53,7 @@
 </head>
 
 <body style="background:#F2F2F2;">
+    {% verbatim %}
     <div id="app">
         <!--在线客服-->
         <div id="chat_logo">
@@ -66,7 +67,7 @@
                 <f7-messages ref="messages">
                     <f7-messages-title>
                         {{ new Date().toLocaleTimeString() }}</f7-messages-title>
-                    <f7-message v-for="(message, index) in messages" :key="index" :type="message.type" :text="message.message" :image="message.image"
+                    <f7-message v-for="(message, index) in messagesData" :key="index" :type="message.type" :text="message.message" :image="message.image"
                         :name="message.name" :avatar="message.avatar" :first="isFirstMessage(message, index)" :last="isLastMessage(message, index)"
                         :tail="isTailMessage(message, index)"></f7-message>
                 </f7-messages>
@@ -81,6 +82,7 @@
         </div>
 
     </div>
+    {% endverbatim %}
     <!--在线客服结束-->
     </div>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.js"></script>
@@ -110,7 +112,7 @@
             },
             data: {
                 baseUrl: '',
-                messages: [],
+                messagesData: [],
                 id: '',
                 name: '',
                 avatar: '',
@@ -119,7 +121,7 @@
                 this.baseUrl = window.location.protocol + '//' + window.location.host + '/';
             },
             methods: {
-                isFirstMessage(message, index) {
+                isFirstMessage: function (message, index) {
                     const self = this;
                     const previousMessage = self.messagesData[index - 1];
                     if (message.isTitle) return false;
@@ -127,7 +129,7 @@
                         message.name) return true;
                     return false;
                 },
-                isLastMessage(message, index) {
+                isLastMessage: function (message, index) {
                     const self = this;
                     const nextMessage = self.messagesData[index + 1];
                     if (message.isTitle) return false;
@@ -135,7 +137,7 @@
                         return true;
                     return false;
                 },
-                isTailMessage(message, index) {
+                isTailMessage: function (message, index) {
                     const self = this;
                     const nextMessage = self.messagesData[index + 1];
                     if (message.isTitle) return false;
@@ -159,8 +161,8 @@
                     if (message.length) self.messagebar.focus();
 
                     // Add sent message
-                    var time = new Date().toLocaleTimeString(); //获得发送时间
-                    self.messages.push({
+                    var time = new Date(); //获得发送时间
+                    self.messagesData.push({
                         id: self.id,
                         type: 'client_message',
                         time: time,
@@ -172,6 +174,8 @@
                         'id': self.id,
                         'type': 'client_message',
                         'time': time,
+                        'name': '小强',
+                        'avatar': '/static/images/self.jpg',
                         'message': message
                     }));
 
@@ -199,7 +203,7 @@
                             $$(this).next().animate({
                                 right: '5px'
                             });
-                            $$(this).css('backgroundImage', 'url(images/go_right.svg)');
+                            $$(this).css('backgroundImage', 'url(/static/images/go_right.svg)');
                         }
                     });
                     //和服务器建立WebSocket链接
@@ -207,7 +211,7 @@
                     let connection_string = '';
                     let id = String(new Date().getTime()) + Math.floor(Math.random() * 10);
                     self.id = id;
-                    connection_string = ws_protocol + window.location.host + '/ws/client/' + id + '/';
+                    connection_string = ws_protocol + window.location.host + '/ws/client/1/';
                     console.log('connection string:' + connection_string)
                     self.socket = new WebSocket(connection_string);
 
@@ -246,7 +250,7 @@
                                 break;
                             case 'service_message':
                                 //监听服务器转发的客服消息
-                                self.messages.push({
+                                self.messagesData.push({
                                     id: id,
                                     type: 'service',
                                     time: time,

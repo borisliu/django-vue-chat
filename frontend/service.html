@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-ui@2.3.7/lib/theme-chalk/index.css">
     <style>
         body {
-            background: #f5f5f5 url('images/bg.jpg') no-repeat center;
+            background: #f5f5f5 url('/static/images/bg.jpg') no-repeat center;
         }
 
         .el-aside {
@@ -180,6 +180,7 @@
 </head>
 
 <body>
+    {% verbatim %}
     <div id="app">
         <el-row type="flex" justify="center">
             <el-col :span="16">
@@ -207,7 +208,7 @@
                                         <span>{{ item.time | time }}</span>
                                     </p>
                                     <div class="main" :class="{ self: item.type == 'service' }">
-                                        <img class="avatar" width="30" height="30" :src="item.type == 'service' ? user.img : currentSession.user.img" />
+                                        <img class="avatar" width="30" height="30" :src="item.type == 'service' ? user.avatar : currentSession.user.avatar" />
                                         <div class="text">{{ item.message }}</div>
                                     </div>
                                 </li>
@@ -226,6 +227,7 @@
             </el-col>
         </el-row>
     </div>
+    {% endverbatim %}
 
 </body>
 <!-- import Vue before Element -->
@@ -244,13 +246,13 @@
             content: '',
             user: {
                 name: 'coffce',
-                img: 'images/self.jpg'
+                avatar: '/static/images/self.jpg'
             },
             sessions: [{
                     id: 0,
                     user: {
                         name: '示例',
-                        img: 'images/client.png'
+                        avatar: '/static/images/client.png'
                     },
                     messages: [{
                         message: 'Hello，这是一个基于Vue + Vuex + Webpack构建的简单chat示例，聊天记录保存在localStorge, 有什么问题可以通过Github Issue问我。',
@@ -326,7 +328,7 @@
                     id: 1,
                     user: {
                         name: '介绍',
-                        img: 'images/client.png'
+                        avatar: '/static/images/client.png'
                     },
                     messages: [{
                         message: 'Hello, 有什么问题可以通过Github Issue问我。',
@@ -361,8 +363,9 @@
             time(date) {
                 if (typeof date === 'string') {
                     date = new Date(date);
+                    return date.toLocaleTimeString();
                 }
-                return date.toLocaleTimeString();
+                return date;
             }
         },
         mounted: function () {
@@ -376,13 +379,15 @@
             } else {
                 ws_protocol = 'ws://';
             }
-            connection_string = ws_protocol + window.location.host + '/ws/master/' + this.user.name + '/';
+            connection_string = ws_protocol + window.location.host + '/ws/service/1/';
             console.log('in service.html, connection string:' + connection_string);
             var socket = new WebSocket(connection_string);
 
             //监听服务器转发的客户消息
             socket.onmessage = function (e) {
                 let data = JSON.parse(e.data);
+                console.log('in socket.onmessage:');
+                console.log(e);
                 let id = data['id'];
                 let time = data['time'];
                 let type = data['type']
@@ -407,11 +412,11 @@
                                     name: name,
                                     avatar: avatar,
                                 },
-                                messages: {
+                                messages: [{
                                     message: message,
                                     time: time,
                                     type: 'client',
-                                }
+                                }]
                             })
                         }
                         $('div.message').scrollTop($('div.message ul')[0].scrollHeight);
@@ -421,6 +426,14 @@
                         console.log(data);
                         break;
                 }
+            };
+
+            socket.onopen = function () {
+                console.log("opening a connection...");
+            };
+
+            socket.onerror = function (evt) {
+                console.log("ERR: " + evt.data);
             };
 
             socket.onclose = function (e) {
