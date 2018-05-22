@@ -202,7 +202,7 @@
 
                     <el-main id="chat">
                         <div class="message">
-                            <ul>
+                            <ul v-if="currentSessionId">
                                 <li v-for="item in currentSession.messages">
                                     <p class="time">
                                         <span>{{ item.time | time }}</span>
@@ -215,12 +215,12 @@
                             </ul>
                         </div>
                         <div class="word">
-                            <el-input type="textarea" :rows="4" @keyup="onKeyup" v-model="content">
+                            <el-input type="textarea" :rows="4" @keyup="onKeyup" v-model="content" :disabled="!currentSessionId">
                             </el-input>
                         </div>
                         <div class="send">
                             <span>按 Ctrl + Enter 发送</span>
-                            <el-button plain size="mini">发送</el-button>
+                            <el-button plain size="mini" v-on:click="sendMessage">发送</el-button>
                         </div>
                     </el-main>
                 </el-container>
@@ -239,7 +239,6 @@
 <!-- import jQuery -->
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.js"></script>
 <script>
-    let now = new Date();
     let vm = new Vue({
         el: '#app',
         data: {
@@ -248,104 +247,9 @@
                 name: 'coffce',
                 avatar: '/static/images/self.jpg'
             },
-            sessions: [{
-                    id: 0,
-                    user: {
-                        name: '示例',
-                        avatar: '/static/images/client.png'
-                    },
-                    messages: [{
-                        message: 'Hello，这是一个基于Vue + Vuex + Webpack构建的简单chat示例，聊天记录保存在localStorge, 有什么问题可以通过Github Issue问我。',
-                        time: now,
-                        type: 'client',
-                    }, {
-                        message: '项目地址: https://github.com/coffcer/vue-chat',
-                        time: now,
-                        type: 'client',
-                    }, {
-                        message: '你好',
-                        time: now,
-                        type: 'service'
-                    }, {
-                        message: '项目地址: https://github.com/coffcer/vue-chat',
-                        time: now,
-                        type: 'client',
-                    }, {
-                        message: '你好',
-                        time: now,
-                        type: 'service'
-                    }, {
-                        message: '项目地址: https://github.com/coffcer/vue-chat',
-                        time: now,
-                        type: 'client',
-                    }, {
-                        message: '你好',
-                        time: now,
-                        type: 'service'
-                    }, {
-                        message: '项目地址: https://github.com/coffcer/vue-chat',
-                        time: now,
-                        type: 'client',
-                    }, {
-                        message: '你好',
-                        time: now,
-                        type: 'service'
-                    }, {
-                        message: '项目地址: https://github.com/coffcer/vue-chat',
-                        time: now,
-                        type: 'client',
-                    }, {
-                        message: '你好',
-                        time: now,
-                        type: 'service'
-                    }, {
-                        message: '项目地址: https://github.com/coffcer/vue-chat',
-                        time: now,
-                        type: 'client',
-                    }, {
-                        message: '你好',
-                        time: now,
-                        type: 'service'
-                    }, {
-                        message: '项目地址: https://github.com/coffcer/vue-chat',
-                        time: now,
-                        type: 'client',
-                    }, {
-                        message: '你好',
-                        time: now,
-                        type: 'service'
-                    }, {
-                        message: '项目地址: https://github.com/coffcer/vue-chat',
-                        time: now,
-                        type: 'client',
-                    }, {
-                        message: '你好',
-                        time: now,
-                        type: 'service'
-                    }]
-                },
-                {
-                    id: 1,
-                    user: {
-                        name: '介绍',
-                        avatar: '/static/images/client.png'
-                    },
-                    messages: [{
-                        message: 'Hello, 有什么问题可以通过Github Issue问我。',
-                        time: now,
-                        type: 'client',
-                    }, {
-                        message: '项目 https://github.com/coffcer/vue-chat',
-                        time: now,
-                        type: 'client',
-                    }, {
-                        message: '你好啊。',
-                        time: now,
-                        type: 'service',
-                    }]
-                }
-            ],
-            currentSessionId: 0,
+            sessions: [],
+            currentSessionId: null,
+            socket: null
         },
         computed: {
             currentSession: function () {
@@ -356,6 +260,38 @@
         methods: {
             onKeyup: function () {
                 return true;
+            },
+            sendMessage: function (event) {
+                message = this.content;
+
+                if (message) {
+                    let id = this.currentSession.id;
+                    let type = 'service';
+                    let time = new Date();
+                    let name = this.user.name;
+                    let avatar = this.user.avatar;
+
+                    this.currentSession.messages.push({
+                        time: time.toString(),
+                        type: type,
+                        message: message
+                    });
+
+                    this.socket.send(JSON.stringify({
+                        'id': id,
+                        'type': 'service_message',
+                        'time': time.toString(),
+                        'name': name,
+                        'avatar': avatar,
+                        'message': message
+                    }));
+                    if (this.currentSessionId) {
+                        this.$nextTick(function() {
+                            $('div.message').scrollTop($('div.message ul')[0].scrollHeight);
+                        })
+                    }
+                    this.content = '';
+                }
             }
         },
         filters: {
@@ -381,13 +317,11 @@
             }
             connection_string = ws_protocol + window.location.host + '/ws/service/1/';
             console.log('in service.html, connection string:' + connection_string);
-            var socket = new WebSocket(connection_string);
+            this.socket = new WebSocket(connection_string);
 
             //监听服务器转发的客户消息
-            socket.onmessage = function (e) {
+            this.socket.onmessage = function (e) {
                 let data = JSON.parse(e.data);
-                console.log('in socket.onmessage:');
-                console.log(e);
                 let id = data['id'];
                 let time = data['time'];
                 let type = data['type']
@@ -400,9 +334,9 @@
                         if (session) {
                             //找到了已经有的用户
                             session.messages.push({
-                                message: message,
                                 time: time,
                                 type: 'client',
+                                message: message,
                             });
                         } else {
                             //没有找到用户，需要新建一个session
@@ -413,67 +347,35 @@
                                     avatar: avatar,
                                 },
                                 messages: [{
-                                    message: message,
                                     time: time,
                                     type: 'client',
+                                    message: message,
                                 }]
                             })
                         }
-                        $('div.message').scrollTop($('div.message ul')[0].scrollHeight);
-                        break;
+                        if (self.currentSessionId) {
+                            self.$nextTick(function() {
+                                $('div.message').scrollTop($('div.message ul')[0].scrollHeight);
+                            })
+                        }
+                            break;
                     case 'service_message':
-                        console.log('master_message');
-                        console.log(data);
+                        console.log('service_message');
                         break;
                 }
             };
 
-            socket.onopen = function () {
+            this.socket.onopen = function () {
                 console.log("opening a connection...");
             };
 
-            socket.onerror = function (evt) {
+            this.socket.onerror = function (evt) {
                 console.log("ERR: " + evt.data);
             };
 
-            socket.onclose = function (e) {
+            this.socket.onclose = function (e) {
                 console.error('Chat socket closed unexpectedly');
             };
-
-
-            //点击发送按钮，发送信息给在线客服
-            $("#send").bind("click", function () {
-                var $this = $(this);
-
-                //如果输入框不为空
-                if ($this.prev().val() != "") {
-                    var choosed = $("#choose_chat option:selected").val();
-                    var destination_id = "/custom#" + choosed; //要发送到的客户端id
-                    console.log(destination_id);
-                    var message = $this.prev().val();
-                    var $pause = $("#message1").clone();
-                    var time = new Date().toLocaleTimeString(); //获得发送时间
-                    var $chat_pause = $("#" + choosed); //获得聊天信息框准备插入新数据
-
-                    //把数据通过socket.io发送给后台
-                    socket.send(JSON.stringify({
-                        'type': 'master_message',
-                        'time': time,
-                        'destionation_id': destination_id,
-                        'message': message
-                    }));
-
-                    $this.prev().val(""); //点发送，清空输入框
-                    $pause.find(".custom_message_contain").text(message);
-                    $pause.css("display", "block");
-                    $pause.attr("id", "");
-                    $pause.find(".message_time").text(time);
-
-                    $chat_pause.append($pause).append("<div style='clear:both'></div>");
-                    $chat_pause.scrollTop($chat_pause[0].scrollHeight); //滚动条置底
-                }
-                $('#chat_input').focus();
-            });
 
         }
     })

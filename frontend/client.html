@@ -161,11 +161,14 @@
                     if (message.length) self.messagebar.focus();
 
                     // Add sent message
-                    var time = new Date(); //获得发送时间
+                    let time = new Date(); //获得发送时间
+                    console.log('in sendMessage:' + time);
                     self.messagesData.push({
                         id: self.id,
-                        type: 'client_message',
-                        time: time,
+                        type: 'sent',
+                        time: time.toString(),
+                        name: '小强',
+                        avatar: '/static/images/client.png',
                         message: message
                     });
 
@@ -173,9 +176,9 @@
                     self.socket.send(JSON.stringify({
                         'id': self.id,
                         'type': 'client_message',
-                        'time': time,
+                        'time': time.toString(),
                         'name': '小强',
-                        'avatar': '/static/images/self.jpg',
+                        'avatar': '/static/images/client.png',
                         'message': message
                     }));
 
@@ -230,8 +233,8 @@
                     self.socket.onmessage = function (e) {
                         let data = JSON.parse(e.data);
                         let id = data['id'];
-                        let type = data['type']
-                        let time = data['time']
+                        let type = data['type'];
+                        let time = new Date(data['time']);
                         let message = data['message'];
                         let name = data['name'];
                         let avatar = data['avatar'];
@@ -246,14 +249,13 @@
                                 break;
                             case 'client_message':
                                 console.log('client_message');
-                                console.log(data);
                                 break;
                             case 'service_message':
                                 //监听服务器转发的客服消息
                                 self.messagesData.push({
                                     id: id,
-                                    type: 'service',
-                                    time: time,
+                                    type: 'received',
+                                    time: time.toString(),
                                     message: message,
                                     name: name,
                                     avatar: avatar,
