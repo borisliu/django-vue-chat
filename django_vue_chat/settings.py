@@ -57,8 +57,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-                 os.path.join(BASE_DIR, 'frontend'), 
-                ],
+            os.path.join(BASE_DIR, 'frontend'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -131,7 +131,7 @@ STATICFILES_DIRS = [
 # Channels
 ASGI_APPLICATION = 'django_vue_chat.routing.application'
 CHANNEL_LAYERS = {
-    'default': {
+    'default':{
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [("127.0.0.1", 6379)],

@@ -163,3 +163,5 @@ typings/
 .env
 
 settings.json
+
+dump.rdb
