@@ -196,7 +196,7 @@
                             </div>
                         </el-card>
                         <el-menu :default-active="String(currentSessionId)">
-                            <el-menu-item v-for="session in sessions" @click="currentSessionId=session.id" :key="session.id" :index="String(session.id)">{{ session.user.name }}</el-menu-item>
+                            <el-menu-item v-for="session in sessions" @click="currentSessionId=session.id;currentSession.user.badge=0;" :key="session.id" :index="String(session.id)">{{ session.user.name }}<el-badge v-if="session.user.badge > 0" class="mark" :value="session.user.badge" /></el-menu-item>
                         </el-menu>
                     </el-aside>
 
@@ -338,6 +338,9 @@
                                 type: 'client',
                                 message: message,
                             });
+                            if (session.id != self.currentSessionId) {
+                                session.user.badge += 1;
+                            }
                         } else {
                             //没有找到用户，需要新建一个session
                             self.sessions.push({
@@ -345,6 +348,7 @@
                                 user: {
                                     name: name,
                                     avatar: avatar,
+                                    badge: 1,
                                 },
                                 messages: [{
                                     time: time,
