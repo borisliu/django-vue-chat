@@ -75,7 +75,7 @@ Open another browser to visit [http://localhost:8000/client.html](). You can get
 
 ![](https://raw.github.com/borisliu/django-vue-chat/master/screenshot/service3.png)
 
-## How to contrubite
+## How to contribute
 
 1. Fork the source code in your own github repo.
 2. Create a new branch named Feature_xxx.
